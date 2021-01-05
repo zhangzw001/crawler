@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/zhangzw001/crawler/scheduler"
 	"log"
 )
 
@@ -14,9 +15,11 @@ type ConcurrentEngine struct {
 type Scheduler interface {
 	Submit(Request)
 	ConfigMasterWorkerChan(chan Request )
+	WorkerReady(chan Request)
+	Run()
 }
 
-func (e ConcurrentEngine) Run(seeds ...Request) {
+func (e *ConcurrentEngine) Run(seeds ...Request) {
 
 	//
 	for _, req  := range seeds {
@@ -24,11 +27,13 @@ func (e ConcurrentEngine) Run(seeds ...Request) {
 	}
 
 	//
-	in := make(chan Request)
 	out := make(chan ParseResult)
-	e.Scheduler.ConfigMasterWorkerChan(in)
+	// 创建
+	e.Scheduler = scheduler.CreateQueue()
+	// run
+	go e.Scheduler.Run()
 	for i := 0 ; i < e.WorkerCount ; i ++ {
-		go createWorker(in, out )
+		go createWorker(out , e.Scheduler)
 	}
 
 	for {
@@ -47,9 +52,12 @@ func (e ConcurrentEngine) Run(seeds ...Request) {
 
 
 
-func createWorker(req chan Request, result chan ParseResult) {
+func createWorker(result chan ParseResult,s Scheduler) {
+	in := make(chan Request)
 	for {
-		request := <-req
+		// tel scheduler i'm ready
+		s.WorkerReady(in)
+		request := <- in
 		parseResult, err := worker(request)
 		if err != nil {
 			continue
