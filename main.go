@@ -24,8 +24,18 @@ func main() {
 	//})
 
 
+	//e := engine.ConcurrentEngine{
+	//	Scheduler: scheduler.CreateSimple(),
+	//	WorkerCount: 3 ,
+	//}
+	//
+	//e.Run(engine.Request{
+	//	Url:        urlYouYuan,
+	//	ParserFunc: parser.CityListParser,
+	//})
+	//
 	e := engine.ConcurrentEngine{
-		Scheduler: scheduler.CreateQueueScheduler(),
+		Scheduler: scheduler.CreateQueue(),
 		WorkerCount: 3 ,
 	}
 

@@ -10,7 +10,11 @@ type QueueScheduler struct {
 	workerChan  chan chan engine.Request
 }
 
-func CreateQueueScheduler() *QueueScheduler {
+func (s *QueueScheduler) WorkerChan() chan engine.Request {
+	return make(chan engine.Request)
+}
+
+func CreateQueue() *QueueScheduler {
 	var q QueueScheduler
 	q.workerChan = make(chan chan engine.Request)
 	q.requestChan = make(chan engine.Request)
@@ -27,6 +31,7 @@ func (s *QueueScheduler) WorkerReady(w chan engine.Request) {
 func (s *QueueScheduler) Run() {
 	//s.requestChan = make(chan engine.Request)
 	//s.workerChan = make(chan chan engine.Request)
+
 	var requestQ []engine.Request
 	var workerQ []chan engine.Request
 	var activeRequest engine.Request
@@ -49,5 +54,4 @@ func (s *QueueScheduler) Run() {
 			time.Sleep(100 * time.Millisecond)
 		}
 	}
-
 }

@@ -12,11 +12,17 @@ type ConcurrentEngine struct {
 
 
 type Scheduler interface {
+	ReadyNotifier
 	Submit(Request)
-	WorkerChan()
-	WorkerReady(chan Request)
+	WorkerChan()  chan Request
 	Run()
 }
+
+// createWorker 函数传入 Scheduler 比较重
+type ReadyNotifier interface {
+	WorkerReady(chan Request)
+}
+
 
 func (e ConcurrentEngine) Run(seeds ...Request) {
 	//
@@ -24,12 +30,13 @@ func (e ConcurrentEngine) Run(seeds ...Request) {
 		go e.Scheduler.Submit(req)
 	}
 	out := make(chan ParseResult)
-	// run
+	//
 	go e.Scheduler.Run()
 
 	for i := 0 ; i < e.WorkerCount ; i ++ {
-		go createWorker(out , e.Scheduler)
+		createWorker(e.Scheduler.WorkerChan(), out , e.Scheduler)
 	}
+
 	for {
 		result :=  <- out
 		for _, item := range result.Items {
@@ -38,22 +45,24 @@ func (e ConcurrentEngine) Run(seeds ...Request) {
 		for _, req := range result.Requests {
 			go e.Scheduler.Submit(req )
 		}
+
 	}
 
 }
 
 
 
-func createWorker(result chan ParseResult,s Scheduler) {
-	in := make(chan Request)
-	for {
-		// tel scheduler i'm ready
-		s.WorkerReady(in)
-		request := <- in
-		parseResult, err := worker(request)
-		if err != nil {
-			continue
+func createWorker(in chan Request, result chan ParseResult,ready ReadyNotifier) {
+	go func() {
+		for {
+			// tel scheduler i'm ready
+			ready.WorkerReady(in)
+			request := <-in
+			parseResult, err := worker(request)
+			if err != nil {
+				continue
+			}
+			result <- parseResult
 		}
-		result <- parseResult
-	}
+	}()
 }
