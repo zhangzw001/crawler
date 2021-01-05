@@ -17,8 +17,7 @@ func CityParser(contents []byte, gender string,workAddress string ) engine.Parse
 	// 根据正则表达式获取城市页面的所有 人的连接
 	cityMatches := cityRe.FindAllSubmatch(contents,-1)
 	// 首先定义返回的数据
-	var reqs []engine.Request
-	//var items []engine.Item
+	result := engine.ParseResult{}
 	// 对正则表达式获取的所有连接进行存储, ?注意, 这里只查询了第一页
 	for _, m := range cityMatches {
 		url := public.UrlYouYuan+string(m[1])
@@ -30,7 +29,7 @@ func CityParser(contents []byte, gender string,workAddress string ) engine.Parse
 				return ProfileParser(contents, url, name ,gender,workAddress)
 			},
 		}
-		reqs = append(reqs, req )
+		result.Requests = append(result.Requests, req)
 		//items = append(items ,m[2])
 	}
 
@@ -47,12 +46,11 @@ func CityParser(contents []byte, gender string,workAddress string ) engine.Parse
 				return CityParser(contents, public.YouYuanMM,workAddress)
 			},
 		}
-		reqs = append(reqs, req )
+		result.Requests = append(result.Requests, req )
 	}
 
 	for _, m := range cityPageGGMatches {
 		//fmt.Printf("Regexp Get >>> cityPage Url: %s ",m[1])
-
 		req := engine.Request{
 			Url:        public.UrlYouYuan+string(m[1]),
 			// 这里在继续对获取的下一页 进行 CityParser, 因为下一页还是城市信息
@@ -60,10 +58,7 @@ func CityParser(contents []byte, gender string,workAddress string ) engine.Parse
 				return CityParser(contents, public.YouYuanGG,workAddress)
 			},
 		}
-		reqs = append(reqs, req )
+		result.Requests = append(result.Requests, req )
 	}
-	return engine.ParseResult{
-		Requests: reqs,
-		//Items:    items,
-	}
+	return result
 }

@@ -1,13 +1,15 @@
 package engine
 
 import (
+	"fmt"
 	"log"
 )
 
-type SimpleEngine struct {}
-// SimpleEngine 主要是修改一下功能:
+// 单机版的简单engine
+type SingleEngine struct {}
+// SingleEngine 主要是修改一下功能:
 // 1. 提取fetch 和抓取函数 worker
-func (s SimpleEngine) Run(seeds ...Request) {
+func (s SingleEngine) Run(seeds ...Request) {
 	// 申明一个需要爬取的请求队列
 	var requests []Request
 	// 将传入的 根Request请求添加到队列
@@ -21,18 +23,18 @@ func (s SimpleEngine) Run(seeds ...Request) {
 	}
 
 	// 只要队列长度大于0 , 就继续爬取
-	item:=0
 	for len(requests) >  0 {
 		// 怎么爬取呢?
 		// 一个个取, 取第一个, 然后删除第一个
 		req := requests[0]
 		requests = requests[1:]
-
+		log.Printf("Fetching url %s\n",  req.Url)
 		parseResult , err := worker(req)
 		if err !=nil {
 			log.Printf("Fetcher.Fetch err : %v", err)
-		}else {
-			log.Printf("Fetching url #%d: %s", item, req.Url)
+		}
+		for _ , item := range parseResult.Items {
+			fmt.Printf("Got Item : %v\n",item)
 		}
 		// 再将返回的内容中的request 加到队列中
 		for _, req := range parseResult.Requests {

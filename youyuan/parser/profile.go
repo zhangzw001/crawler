@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"github.com/zhangzw001/crawler/engine"
 	"github.com/zhangzw001/crawler/model"
 	"github.com/zhangzw001/crawler/public"
@@ -24,7 +23,7 @@ var (
 	idUrlRe      = regexp.MustCompile(`http://www.youyuan.com/(\d+)-profile/`)
 
 	// 这里只能取到id
-	guessRe = regexp.MustCompile(`<li class="inPerson" data-kd="(\d+)"><a href="/login.html"`)
+	p = regexp.MustCompile(`<li class="inPerson" data-kd="(\d+)"><a href="/login.html"`)
 )
 
 
@@ -77,8 +76,7 @@ func ProfileParser(contents []byte, url string ,  name string, gender string  ,w
 			},
 		},
 	}
-	fmt.Printf("%v\n",result)
-
+	//fmt.Printf("%v\n",result)
 	return result
 }
 

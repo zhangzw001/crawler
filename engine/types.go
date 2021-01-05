@@ -11,6 +11,7 @@ type Request struct {
 // 返回结果是Request列表 和 item
 type ParseResult struct {
 	Requests []Request
+	//Items    []interface{}
 	Items    []Item
 }
 

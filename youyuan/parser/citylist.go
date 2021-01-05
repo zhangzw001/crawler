@@ -18,7 +18,7 @@ func CityListParser(contents []byte) engine.ParseResult {
 	// 这里只有在城市的首页才能取到例如  北京男士征婚/北京女士征婚, 所以必须从这里开始传 给ProfileParser
 	cityListMatches := cityListRe.FindAllSubmatch(contents,-1)
 
-	var reqs []engine.Request
+	result := engine.ParseResult{}
 	//var items []engine.Item
 	for _, m := range cityListMatches{
 		// 这里必须定义遍历, 如果直接传string(m[2]) 给后面, 等到函数执行的时候, 传入的值都不会变了, 都是同一个地址
@@ -33,11 +33,8 @@ func CityListParser(contents []byte) engine.ParseResult {
 				return CityParser(contents, public.YouYuanMM,workAddress)
 			},
 		}
-		reqs = append(reqs, req)
+		result.Requests = append(result.Requests, req)
 		//items = append(items, string(m[2]))
 	}
-	return engine.ParseResult{
-		Requests: reqs,
-		//Items:    items,
-	}
+	return result
 }
