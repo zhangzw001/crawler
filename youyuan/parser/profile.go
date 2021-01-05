@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"github.com/zhangzw001/crawler/engine"
 	"github.com/zhangzw001/crawler/model"
 	"github.com/zhangzw001/crawler/public"
@@ -77,7 +76,7 @@ func ProfileParser(contents []byte, url string ,  name string, gender string  ,w
 			},
 		},
 	}
-	fmt.Printf("%v\n",result)
+	//fmt.Printf("%v\n",result)
 
 	return result
 }

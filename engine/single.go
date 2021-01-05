@@ -4,10 +4,10 @@ import (
 	"log"
 )
 
-type SimpleEngine struct {}
-// SimpleEngine 主要是修改一下功能:
+type SingleEngine struct {}
+// SingleEngine 主要是修改一下功能:
 // 1. 提取fetch 和抓取函数 worker
-func (s SimpleEngine) Run(seeds ...Request) {
+func (s SingleEngine) Run(seeds ...Request) {
 	// 申明一个需要爬取的请求队列
 	var requests []Request
 	// 将传入的 根Request请求添加到队列

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/zhangzw001/crawler/engine"
-	"github.com/zhangzw001/crawler/public"
+	"github.com/zhangzw001/crawler/scheduler"
 	"github.com/zhangzw001/crawler/youyuan/parser"
 )
 
@@ -23,10 +23,14 @@ func main() {
 	//	ParserFunc: parser.CityListParser,
 	//})
 
-	engine.Run(engine.Request{
-		Url:        urlYouYuanCity,
-		ParserFunc: func(contents []byte) engine.ParseResult{
-			return parser.CityParser(contents, public.YouYuanMM,"上海")
-		},
+
+	e := engine.ConcurrentEngine{
+		Scheduler: &scheduler.SimpleScheduler{},
+		WorkerCount: 3 ,
+	}
+
+	e.Run(engine.Request{
+		Url:        urlYouYuan,
+		ParserFunc: parser.CityListParser,
 	})
 }
