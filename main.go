@@ -24,18 +24,8 @@ func main() {
 	//})
 
 
-	//e := engine.ConcurrentEngine{
-	//	Scheduler: scheduler.CreateSimple(),
-	//	WorkerCount: 3 ,
-	//}
-	//
-	//e.Run(engine.Request{
-	//	Url:        urlYouYuan,
-	//	ParserFunc: parser.CityListParser,
-	//})
-	//
 	e := engine.ConcurrentEngine{
-		Scheduler: scheduler.CreateQueue(),
+		Scheduler: scheduler.CreateSimple(),
 		WorkerCount: 3 ,
 	}
 
@@ -43,4 +33,14 @@ func main() {
 		Url:        urlYouYuan,
 		ParserFunc: parser.CityListParser,
 	})
+
+	//e := engine.ConcurrentEngine{
+	//	Scheduler: scheduler.CreateQueue(),
+	//	WorkerCount: 3 ,
+	//}
+	//
+	//e.Run(engine.Request{
+	//	Url:        urlYouYuan,
+	//	ParserFunc: parser.CityListParser,
+	//})
 }
