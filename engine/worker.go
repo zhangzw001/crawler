@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/zhangzw001/crawler/fetcher"
+	"github.com/zhangzw001/crawler/public"
 )
 
 func worker(req Request) (ParseResult,error ){
@@ -14,4 +15,14 @@ func worker(req Request) (ParseResult,error ){
 	// 对fetch的内容调用函数
 	result = req.ParserFunc(body)
 	return result,nil
+}
+
+
+
+func isDuplicated(url string) bool  {
+	if public.Duplicated[url] {
+		return true
+	}
+	public.Duplicated[url] = true
+	return false
 }
