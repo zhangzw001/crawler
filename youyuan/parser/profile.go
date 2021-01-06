@@ -43,6 +43,10 @@ func ProfileParser(contents []byte, url string ,  name string, gender string  ,w
 	weight, err := strconv.Atoi(extractString(contents, weightRe))
 	if err == nil {
 		profile.Weight = weight
+		if weight > 180 {
+			profile.Weight = weight -100
+		}
+
 	}
 	//
 
@@ -78,6 +82,19 @@ func ProfileParser(contents []byte, url string ,  name string, gender string  ,w
 	}
 	//fmt.Printf("%v\n",result)
 
+	//猜你喜欢
+	matches := guessRe.FindAllSubmatch(contents,-1)
+	for _, m := range matches {
+		url := public.UrlYouYuan+"/"+string(m[1])+"-profile/"
+		//log.Printf("猜你喜欢url: %v",url)
+		result.Requests = append(result.Requests,
+			engine.Request{
+				Url:        url,
+				// 这里猜你喜欢并没有用户名
+				ParserFunc: NewProfileParser(url,"",gender,workAddress),
+			})
+	}
+
 	return result
 }
 
@@ -88,5 +105,13 @@ func extractString(contents []byte, re *regexp.Regexp) string {
 		return string(match[1])
 	} else {
 		return ""
+	}
+}
+
+
+// 包装一下
+func NewProfileParser(url,name,gender,workAddress string ) func([]byte) engine.ParseResult{
+	return func(contents []byte) engine.ParseResult {
+		return ProfileParser(contents, url, name, gender, workAddress)
 	}
 }

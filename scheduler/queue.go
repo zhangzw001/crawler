@@ -34,10 +34,11 @@ func (s *QueueScheduler) Run() {
 
 	var requestQ []engine.Request
 	var workerQ []chan engine.Request
-	var activeRequest engine.Request
-	var activeWorker chan engine.Request
 
 	for {
+		var activeRequest engine.Request
+		var activeWorker chan engine.Request
+
 		if len(requestQ) > 0 && len(workerQ) > 0 {
 			activeRequest = requestQ[0]
 			activeWorker = workerQ[0]
@@ -51,7 +52,7 @@ func (s *QueueScheduler) Run() {
 			requestQ = requestQ[1:]
 			workerQ = workerQ[1:]
 		default:
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(20 * time.Millisecond)
 		}
 	}
 }

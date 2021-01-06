@@ -1,13 +1,10 @@
 package engine
 
-import (
-	"log"
-)
-
 //
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
+	ItemSaverChan chan Item
 }
 
 type Scheduler interface {
@@ -38,7 +35,11 @@ func (e ConcurrentEngine) Run(seeds ...Request) {
 	for {
 		result := <-out
 		for _, item := range result.Items {
-			log.Printf("Got item : %v \n", item)
+			go func(i Item) {
+				e.ItemSaverChan <- i
+			}(item)
+
+
 		}
 		for _, req := range result.Requests {
 			go e.Scheduler.Submit(req)
