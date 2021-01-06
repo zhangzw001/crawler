@@ -33,7 +33,7 @@ func main() {
 
 	e := engine.ConcurrentEngine{
 		Scheduler: scheduler.CreateQueue(),
-		WorkerCount: 20 ,
+		WorkerCount: 1 ,
 		ItemSaverChan: itemSaver,
 	}
 

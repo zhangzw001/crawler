@@ -2,7 +2,6 @@ package scheduler
 
 import (
 	"github.com/zhangzw001/crawler/engine"
-	"time"
 )
 
 type QueueScheduler struct {
@@ -38,7 +37,6 @@ func (s *QueueScheduler) Run() {
 	for {
 		var activeRequest engine.Request
 		var activeWorker chan engine.Request
-
 		if len(requestQ) > 0 && len(workerQ) > 0 {
 			activeRequest = requestQ[0]
 			activeWorker = workerQ[0]
@@ -51,8 +49,6 @@ func (s *QueueScheduler) Run() {
 		case activeWorker <- activeRequest:
 			requestQ = requestQ[1:]
 			workerQ = workerQ[1:]
-		default:
-			time.Sleep(20 * time.Millisecond)
 		}
 	}
 }

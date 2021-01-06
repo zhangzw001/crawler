@@ -28,7 +28,7 @@ func (s SingleEngine) Run(seeds ...Request) {
 		// 一个个取, 取第一个, 然后删除第一个
 		req := requests[0]
 		requests = requests[1:]
-		log.Printf("Fetching url %s\n",  req.Url)
+		//log.Printf("Fetching url %s\n",  req.Url)
 		parseResult , err := worker(req)
 		if err !=nil {
 			log.Printf("Fetcher.Fetch err : %v", err)
