@@ -6,7 +6,9 @@ import (
 
 type Scheduler interface {
 	Submit(Request)
-	GetWorkerChan() chan Request
+	WorkerReady(chan Request)
+	CreateWorkerChan()chan Request	// 主要是对workerChan的每个chan request进行初始化
+	Run()
 }
 
 type ConcurrentEngine struct {
@@ -23,11 +25,13 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 		go e.Scheduler.Submit(req)
 	}
 
+	go e.Scheduler.Run()
 	//2. 创建worker
-	in := e.Scheduler.GetWorkerChan()
+	// 取 chan
 	out := make(chan ParseResult)
+
 	for i := 0; i < e.WorkerCount; i++ {
-		go createWorker(in, out)
+		go createWorker(e.Scheduler.CreateWorkerChan(), out,e.Scheduler)
 	}
 
 	//3. 对结果继续爬取
@@ -44,8 +48,9 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 }
 
 // 2. 创建worker的函数
-func createWorker(in chan Request, out chan ParseResult) {
+func createWorker(in chan Request, out chan ParseResult, e Scheduler) {
 	for {
+		e.WorkerReady(in)
 		req := <-in
 		log.Printf("Working url : %v \n",req.Url)
 		result, err := worker(req)

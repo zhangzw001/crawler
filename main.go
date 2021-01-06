@@ -20,7 +20,7 @@ func main() {
 	//  最后从city页面获取 "http://www.youyuan.com/shanghai/xxx-profile" 某个用户的页面, 会执行 ProfileParser
 
 	e := engine.ConcurrentEngine{
-		Scheduler:   scheduler.CreateSimple(),
+		Scheduler:   scheduler.CreateQueue(),
 		WorkerCount: 4,
 	}
 

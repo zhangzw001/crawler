@@ -7,6 +7,9 @@ type Simple struct {
 	workerChan chan engine.Request
 }
 
+func (s *Simple) Run() {
+}
+
 func CreateSimple() *Simple{
 	var s Simple
 	s.workerChan = make(chan engine.Request)
@@ -17,7 +20,8 @@ func (s *Simple) Submit(req engine.Request) {
 	s.workerChan <- req
 }
 
-func (s *Simple) GetWorkerChan() chan engine.Request {
-	return s.workerChan
+func (s *Simple) GetWorkerChan(in chan engine.Request)  {
+	s.workerChan = in
 }
+
 
