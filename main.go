@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/zhangzw001/crawler/engine"
+	"github.com/zhangzw001/crawler/persist"
 	"github.com/zhangzw001/crawler/scheduler"
 	"github.com/zhangzw001/crawler/youyuan/parser"
+	"log"
 )
 
 const (
@@ -24,9 +26,15 @@ func main() {
 	//})
 
 
+	itemSaver,err := persist.ItemSaver()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	e := engine.ConcurrentEngine{
-		Scheduler: &scheduler.SimpleScheduler{},
-		WorkerCount: 3 ,
+		Scheduler: scheduler.CreateQueue(),
+		WorkerCount: 20 ,
+		ItemSaverChan: itemSaver,
 	}
 
 	e.Run(engine.Request{

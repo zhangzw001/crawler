@@ -1,8 +1,6 @@
 package model
 
-
-
-
+import "encoding/json"
 
 type Profile struct {
 	Name        string //名字,昵称
@@ -19,4 +17,16 @@ type Profile struct {
 	Car         string //车
 	WorkAddress string //工作地点
 	Sex         string //能否接受婚前性行为
+}
+
+
+func FromJsonToProfile(i interface{}) (Profile, error) {
+	var p Profile
+	b, err := json.Marshal(i)
+	if err != nil {
+		return p, err
+	}
+	err = json.Unmarshal(b,&p)
+	return p, nil
+
 }

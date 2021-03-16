@@ -29,9 +29,7 @@ func CityListParser(contents []byte) engine.ParseResult {
 		req := engine.Request{
 			Url:        public.UrlYouYuan+string(m[1]),
 			// 这里在继续对获取到的每个城市继续爬取, 爬取到用户的连接
-			ParserFunc: func(contents []byte) engine.ParseResult{
-				return CityParser(contents, public.YouYuanMM,workAddress)
-			},
+			ParserFunc: NewCityParser(public.YouYuanMM,workAddress),
 		}
 		reqs = append(reqs, req)
 		//items = append(items, string(m[2]))

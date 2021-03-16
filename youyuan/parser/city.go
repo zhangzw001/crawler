@@ -26,9 +26,9 @@ func CityParser(contents []byte, gender string,workAddress string ) engine.Parse
 		req := engine.Request{
 			Url:        url ,
 			// 这里在继续对获取到的用户进行爬取
-			ParserFunc: func(contents []byte) engine.ParseResult{
-				return ProfileParser(contents, url, name ,gender,workAddress)
-			},
+			// 之前 需要定义变量name, 而不用string(m[2])是因为 m存的时候是会被替换的, 最后会是同一个值
+			// 这里由于是函数传参,本身就会copy, 所以直接通过 string(m[2]) 也是可以的
+			ParserFunc: NewProfileParser(url,name,gender,workAddress),
 		}
 		reqs = append(reqs, req )
 		//items = append(items ,m[2])
@@ -43,9 +43,7 @@ func CityParser(contents []byte, gender string,workAddress string ) engine.Parse
 		req := engine.Request{
 			Url:        public.UrlYouYuan+string(m[1]),
 			// 这里在继续对获取的下一页 进行 CityParser, 因为下一页还是城市信息
-			ParserFunc: func(contents []byte) engine.ParseResult{
-				return CityParser(contents, public.YouYuanMM,workAddress)
-			},
+			ParserFunc: NewCityParser(public.YouYuanMM,workAddress),
 		}
 		reqs = append(reqs, req )
 	}
@@ -56,14 +54,19 @@ func CityParser(contents []byte, gender string,workAddress string ) engine.Parse
 		req := engine.Request{
 			Url:        public.UrlYouYuan+string(m[1]),
 			// 这里在继续对获取的下一页 进行 CityParser, 因为下一页还是城市信息
-			ParserFunc: func(contents []byte) engine.ParseResult{
-				return CityParser(contents, public.YouYuanGG,workAddress)
-			},
+			ParserFunc: NewCityParser(public.YouYuanGG,workAddress),
 		}
 		reqs = append(reqs, req )
 	}
 	return engine.ParseResult{
 		Requests: reqs,
 		//Items:    items,
+	}
+}
+
+
+func NewCityParser(gender,workAddress string ) func([]byte) engine.ParseResult {
+	return func(contents []byte) engine.ParseResult{
+		return CityParser(contents, gender, workAddress)
 	}
 }

@@ -8,11 +8,9 @@ const (
 	YouYuanMM = "女"
 
 	//elastc search
-	EsUrl =""
+	EsUrl ="http://172.16.76.220:9200"
 	EsIndex = "crawler"
 	EsType = "youyuan"
-
-
 )
 
 var (

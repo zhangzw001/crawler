@@ -1,55 +1,58 @@
 package engine
 
-import (
-	"log"
-)
-
 //
 type ConcurrentEngine struct {
-	Scheduler Scheduler
+	Scheduler   Scheduler
 	WorkerCount int
+	ItemSaverChan chan Item
 }
 
-
 type Scheduler interface {
+	ReadyNotifier
 	Submit(Request)
-	ConfigMasterWorkerChan(chan Request )
+	WorkerChan() chan Request
+	Run()
+}
+
+// createWorker 函数传入 Scheduler 比较重
+type ReadyNotifier interface {
+	WorkerReady(chan Request)
 }
 
 func (e ConcurrentEngine) Run(seeds ...Request) {
-
 	//
-	for _, req  := range seeds {
-		e.Scheduler.Submit(req)
+	for _, req := range seeds {
+		go e.Scheduler.Submit(req)
 	}
-
-	//
-	in := make(chan Request)
 	out := make(chan ParseResult)
-	e.Scheduler.ConfigMasterWorkerChan(in)
-	for i := 0 ; i < e.WorkerCount ; i ++ {
-		go createWorker(in, out )
+	//
+	go e.Scheduler.Run()
+
+	for i := 0; i < e.WorkerCount; i++ {
+		go createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
 
 	for {
-		result :=  <- out
-
+		result := <-out
 		for _, item := range result.Items {
-			log.Printf("Got item : %v \n",item)
-		}
+			go func(i Item) {
+				e.ItemSaverChan <- i
+			}(item)
 
+
+		}
 		for _, req := range result.Requests {
-			e.Scheduler.Submit(req )
+			go e.Scheduler.Submit(req)
 		}
 	}
 
 }
 
-
-
-func createWorker(req chan Request, result chan ParseResult) {
+func createWorker(in chan Request, result chan ParseResult, ready ReadyNotifier) {
 	for {
-		request := <-req
+		// tel scheduler i'm ready
+		ready.WorkerReady(in)
+		request := <-in
 		parseResult, err := worker(request)
 		if err != nil {
 			continue

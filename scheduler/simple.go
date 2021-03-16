@@ -1,18 +1,31 @@
 package scheduler
 
-import "github.com/zhangzw001/crawler/engine"
+import (
+	"github.com/zhangzw001/crawler/engine"
+)
 
 type SimpleScheduler struct {
-	WorkerChan chan engine.Request
+	workerChan chan engine.Request
 }
 
-func (s *SimpleScheduler) ConfigMasterWorkerChan(req chan engine.Request) {
-	s.WorkerChan = req
+func CreateSimple() *SimpleScheduler {
+	return &SimpleScheduler{
+		workerChan: make(chan engine.Request),
+	}
 }
-
 func (s *SimpleScheduler) Submit(req engine.Request) {
-	go func(){
-		s.WorkerChan <- req
-	}()
+		s.workerChan <- req
 }
 
+func (s *SimpleScheduler) WorkerChan() chan engine.Request {
+	return s.workerChan
+}
+
+func (s *SimpleScheduler) WorkerReady(chan engine.Request) {
+}
+
+
+func (s *SimpleScheduler) Run() {
+	// 在这里make会有冲突, 因为concurrent里面我是go Run() 执行
+	//s.workerChan = make(chan engine.Request)
+}
